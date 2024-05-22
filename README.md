@@ -1,1 +1,0 @@
-# redmine-manager-data-server
