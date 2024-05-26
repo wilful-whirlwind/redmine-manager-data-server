@@ -1,0 +1,18 @@
+package util
+
+import (
+	"os"
+)
+
+type EnvExampleUtil struct {
+}
+
+func (util EnvUtil) GetPasswordSalt() string {
+	return "正しいパスワードソルトをここに入れる。"
+}
+
+func (util EnvUtil) GetPasswordPepper() string {
+	return os.Getenv("正しいパスワードペッパーの環境キーをここに入れる。")
+}
+
+// EnvExampleUtil -> EnvUtilに変更
