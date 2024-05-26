@@ -31,8 +31,8 @@ func (service UserService) Insert(user entity.User, driver *sql.DB) (int64, erro
 }
 
 func (service UserService) CalculatePasswordHash(password string) string {
-	const salt = "5LPRtUjc71"
 	envUtil := util.EnvUtil{}
+	salt := envUtil.GetPasswordSalt()
 	pepper := envUtil.GetPasswordPepper()
 
 	return fmt.Sprintf("%x", argon2.Key([]byte(password), []byte(salt+pepper), 3, 32*1024, 4, 32))
