@@ -6,3 +6,4 @@ go.sum
 view
 log
 .idea
+util/EnvUtil.go
