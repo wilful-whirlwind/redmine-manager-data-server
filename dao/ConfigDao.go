@@ -18,12 +18,13 @@ func (dao ConfigDao) Insert(key string, value string, createdAt string) (int64, 
 	sqlStr := `
 		insert into 
 		    configurations(
-			  key,
-			  value,
-			  created_at
-			) values (?, ?, ?)
+			  configuration_key,
+			  configuration_value,
+			  created_at,
+			  updated_at
+			) values (?, ?, ?, ?)
 	`
-	result, err := dao.Driver.Exec(sqlStr, key, value, createdAt)
+	result, err := dao.Driver.Exec(sqlStr, key, value, createdAt, createdAt)
 	if err != nil {
 		return -1, errors.New("登録に失敗しました。")
 	}
@@ -59,4 +60,18 @@ func (dao ConfigDao) GetByKey(key string) (entity.Configuration, error) {
 	}
 	dao.Logger.Info("result", "entity", configuration)
 	return configuration, err
+}
+
+func (dao ConfigDao) Delete(key string) error {
+	sqlStr := `
+		delete from 
+		    configurations
+		where
+			configuration_key = ?
+	`
+	_, err := dao.Driver.Exec(sqlStr, key)
+	if err != nil {
+		return errors.New("削除に失敗しました。")
+	}
+	return nil
 }

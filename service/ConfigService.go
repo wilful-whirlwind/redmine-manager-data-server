@@ -27,6 +27,15 @@ func (service ConfigService) Insert(config entity.Configuration, driver *sql.DB)
 	return createdUserId, nil
 }
 
+func (service ConfigService) Delete(key string, driver *sql.DB) (int64, error) {
+	configDao := dao.ConfigDao{Driver: driver}
+	err := configDao.Delete(key)
+	if err != nil {
+		return -1, err
+	}
+	return 1, nil
+}
+
 func (service ConfigService) BindConfigurationEntity(key string, value string) entity.Configuration {
 	return entity.Configuration{
 		Key:       key,

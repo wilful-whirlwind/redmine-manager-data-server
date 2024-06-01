@@ -51,6 +51,10 @@ func (action ConfigController) Post(w http.ResponseWriter, r *http.Request) (map
 	db, err := dao.Driver()
 	configService := service.ConfigService{}
 	configuration := configService.BindConfigurationEntity(requestBody.Key, requestBody.Value)
+	_, err = configService.Delete(requestBody.Key, db)
+	if err != nil {
+		return nil, err
+	}
 	newId, err := configService.Insert(configuration, db)
 	configuration.Id = int(newId)
 	if err != nil {

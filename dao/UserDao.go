@@ -60,3 +60,56 @@ func (dao UserDao) GetById(id int) (entity.User, error) {
 	dao.Logger.Info("result", "entity", selectedUser)
 	return selectedUser, err
 }
+
+func (dao UserDao) GetAll() ([]entity.User, error) {
+	result := make([]entity.User, 0)
+	sqlStr := `
+		SELECT
+		    id,
+		    mail_address,
+		    name,
+		    password_hash,
+		    created_at
+		FROM
+		    users
+	`
+	rows, err := dao.Driver.Query(sqlStr)
+	if err != nil {
+		return result, errors.New("取得に失敗しました。")
+	}
+	selectedUser := entity.User{}
+	for rows.Next() {
+		if err := rows.Scan(&selectedUser.Id, &selectedUser.MailAddress, &selectedUser.Name, &selectedUser.PasswordHash, &selectedUser.CreatedAt); err != nil {
+			log.Fatalf("failed to scan row: %s", err)
+		}
+		result = append(result, selectedUser)
+	}
+	dao.Logger.Info("result", "entity", result)
+	return result, err
+}
+
+func (dao UserDao) GetByHash(hash string) (entity.User, error) {
+	sqlStr := `
+		SELECT
+		    id,
+		    mail_address,
+		    name,
+		    created_at
+		FROM
+		    users
+		WHERE
+		    password_hash = ?
+	`
+	rows, err := dao.Driver.Query(sqlStr, hash)
+	if err != nil {
+		return entity.User{}, errors.New("取得に失敗しました。")
+	}
+	selectedUser := entity.User{}
+	for rows.Next() {
+		if err := rows.Scan(&selectedUser.Id, &selectedUser.MailAddress, &selectedUser.Name, &selectedUser.CreatedAt); err != nil {
+			log.Fatalf("failed to scan row: %s", err)
+		}
+	}
+	dao.Logger.Info("result", "entity", selectedUser)
+	return selectedUser, err
+}

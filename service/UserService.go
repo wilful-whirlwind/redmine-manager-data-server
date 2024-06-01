@@ -46,3 +46,19 @@ func (service UserService) BindUserEntity(mailAddress string, name string, rawPa
 		CreatedAt:    time.Now().Format("2006-01-02 15:04:05"),
 	}
 }
+
+func (service UserService) GetAll(driver *sql.DB) ([]entity.User, error) {
+	userDao := dao.UserDao{Driver: driver, Logger: service.Logger}
+	selectedUser, err := userDao.GetAll()
+	if err != nil {
+		return make([]entity.User, 0), err
+	}
+	return selectedUser, nil
+}
+
+func (service UserService) GetByHash(request string, driver *sql.DB) (entity.User, error) {
+	userDao := dao.UserDao{Driver: driver, Logger: service.Logger}
+	passwordHash := service.CalculatePasswordHash(request)
+	selectedUser, err := userDao.GetByHash(passwordHash)
+	return selectedUser, err
+}

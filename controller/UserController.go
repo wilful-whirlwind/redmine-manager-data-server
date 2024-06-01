@@ -31,20 +31,43 @@ func (action UserController) Get(w http.ResponseWriter, r *http.Request) (map[st
 	userService := service.UserService{
 		Logger: action.base.logger,
 	}
-	requestId, err := strconv.Atoi(query.Get("id"))
-	if err != nil {
-		action.base.logger.Error("リクエストされたIDが不正です。", "error info", err)
+	requestIdRaw := query.Get("id")
+	if requestIdRaw == "all" {
+		selectedUsers, err := userService.GetAll(db)
+		if err != nil {
+			action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)
+			return body, err
+		}
+		body["userList"] = selectedUsers
+		action.base.logger.Info("return", "param", body)
 		return body, err
-	}
+	} else if requestIdRaw == "auth" {
+		passwordRequest := query.Get("password")
 
-	selectedUser, err := userService.GetById(requestId, db)
-	if err != nil {
-		action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)
+		selectedUser, err := userService.GetByHash(passwordRequest, db)
+		if err != nil {
+			action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)
+			return body, err
+		}
+		body["result"] = selectedUser
+		action.base.logger.Info("return", "param", body)
+		return body, err
+	} else {
+		requestId, err := strconv.Atoi(requestIdRaw)
+		if err != nil {
+			action.base.logger.Error("リクエストされたIDが不正です。", "error info", err)
+			return body, err
+		}
+
+		selectedUser, err := userService.GetById(requestId, db)
+		if err != nil {
+			action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)
+			return body, err
+		}
+		body["result"] = selectedUser
+		action.base.logger.Info("return", "param", body)
 		return body, err
 	}
-	body["result"] = selectedUser
-	action.base.logger.Info("return", "param", body)
-	return body, err
 }
 
 func (action UserController) Post(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
