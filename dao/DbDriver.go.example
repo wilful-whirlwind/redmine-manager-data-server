@@ -1,0 +1,27 @@
+package dao
+
+import "database/sql"
+
+type DbDriver struct {
+	name         string
+	password     string
+	host         string
+	port         string
+	databaseName string
+	charset      string
+}
+
+func (driver DbDriver) GetDriver() (*sql.DB, error) {
+	return sql.Open("mysql", driver.name+":"+driver.password+"@("+driver.host+":"+driver.port+")/"+driver.databaseName+"?charset="+driver.charset)
+}
+
+func Driver() (*sql.DB, error) {
+	return DbDriver{
+		name:         "db名",
+		password:     "パスワード",
+		host:         "IPアドレス",
+		port:         "3306",
+		databaseName: "DB名",
+		charset:      "utf8mb4",
+	}.GetDriver()
+}
