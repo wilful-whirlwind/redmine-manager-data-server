@@ -9,7 +9,7 @@ import (
 
 func cors(fs http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8081")
+		w.Header().Set("Access-Control-Allow-Origin", "https://localhost:8081")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT")
 		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Redmine-API-Key, X-CSRF-Token")
@@ -33,7 +33,7 @@ func main() {
 	http.HandleFunc("/user", controller.UserController{}.Execute)
 	http.HandleFunc("/config", controller.ConfigController{}.Execute)
 
-	err := server.ListenAndServe()
+	err := server.ListenAndServeTLS("data_cert.pem", "data_key.pem")
 	if err != nil {
 		return
 	}
