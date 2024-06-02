@@ -7,3 +7,4 @@ view
 log
 .idea
 util/EnvUtil.go
+*.pem
