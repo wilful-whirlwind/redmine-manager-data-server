@@ -8,3 +8,4 @@ log
 .idea
 util/EnvUtil.go
 *.pem
+dao/DbDriver.go
