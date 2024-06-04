@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
@@ -26,6 +27,12 @@ func (action ConfigController) Get(w http.ResponseWriter, r *http.Request) (map[
 	if err != nil {
 		return body, err
 	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			action.base.logger.Error("close db err", err)
+		}
+	}(db)
 
 	configService := service.ConfigService{
 		Logger: action.base.logger,
@@ -49,6 +56,13 @@ func (action ConfigController) Post(w http.ResponseWriter, r *http.Request) (map
 	}
 
 	db, err := dao.Driver()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			action.base.logger.Error("close db err", err)
+		}
+	}(db)
+
 	configService := service.ConfigService{}
 	configuration := configService.BindConfigurationEntity(requestBody.Key, requestBody.Value)
 	_, err = configService.Delete(requestBody.Key, db)

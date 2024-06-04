@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
@@ -27,6 +28,12 @@ func (action UserController) Get(w http.ResponseWriter, r *http.Request) (map[st
 	if err != nil {
 		return body, err
 	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			action.base.logger.Error("close db err", err)
+		}
+	}(db)
 
 	userService := service.UserService{
 		Logger: action.base.logger,
@@ -78,6 +85,12 @@ func (action UserController) Post(w http.ResponseWriter, r *http.Request) (map[s
 	}
 
 	db, err := dao.Driver()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			action.base.logger.Error("close db err", err)
+		}
+	}(db)
 	userService := service.UserService{}
 	user := userService.BindUserEntity(requestBody.MailAddress, requestBody.Name, requestBody.PasswordHash)
 	newUserId, err := userService.Insert(user, db)
