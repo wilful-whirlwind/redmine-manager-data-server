@@ -75,3 +75,30 @@ func (dao ConfigDao) Delete(key string) error {
 	}
 	return nil
 }
+
+func (dao ConfigDao) GetAll() ([]entity.Configuration, error) {
+	sqlStr := `
+		SELECT
+		    id,
+		    configuration_key,
+		    configuration_value,
+		    created_at,
+		    updated_at
+		FROM
+		    configurations
+	`
+	rows, err := dao.Driver.Query(sqlStr)
+	result := make([]entity.Configuration, 0)
+	if err != nil {
+		return result, errors.New("取得に失敗しました。")
+	}
+	for rows.Next() {
+		configuration := entity.Configuration{}
+		if err := rows.Scan(&configuration.Id, &configuration.Key, &configuration.Value, &configuration.CreatedAt, &configuration.UpdatedAt); err != nil {
+			log.Fatalf("failed to scan row: %s", err)
+		}
+		result = append(result, configuration)
+	}
+	dao.Logger.Info("result", "entity", result)
+	return result, err
+}

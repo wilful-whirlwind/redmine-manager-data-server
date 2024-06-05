@@ -44,3 +44,13 @@ func (service ConfigService) BindConfigurationEntity(key string, value string) e
 		UpdatedAt: time.Now().Format("2006-01-02 15:04:05"),
 	}
 }
+
+func (service ConfigService) GetAll(driver *sql.DB) (map[string]entity.Configuration, error) {
+	configDao := dao.ConfigDao{Driver: driver, Logger: service.Logger}
+	configurationList, err := configDao.GetAll()
+	result := map[string]entity.Configuration{}
+	for _, config := range configurationList {
+		result[config.Key] = config
+	}
+	return result, err
+}

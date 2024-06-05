@@ -38,14 +38,25 @@ func (action ConfigController) Get(w http.ResponseWriter, r *http.Request) (map[
 		Logger: action.base.logger,
 	}
 	key := query.Get("key")
-	configuration, err := configService.GetByKey(key, db)
-	if err != nil {
-		action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)
+	if key == "all" {
+		configuration, err := configService.GetAll(db)
+		if err != nil {
+			action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)
+			return body, err
+		}
+		body["result"] = configuration
+		action.base.logger.Info("return", "param", body)
+		return body, err
+	} else {
+		configuration, err := configService.GetByKey(key, db)
+		if err != nil {
+			action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)
+			return body, err
+		}
+		body["result"] = configuration
+		action.base.logger.Info("return", "param", body)
 		return body, err
 	}
-	body["result"] = configuration
-	action.base.logger.Info("return", "param", body)
-	return body, err
 }
 
 func (action ConfigController) Post(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
