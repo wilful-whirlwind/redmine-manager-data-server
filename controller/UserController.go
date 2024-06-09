@@ -92,8 +92,34 @@ func (action UserController) Post(w http.ResponseWriter, r *http.Request) (map[s
 		}
 	}(db)
 	userService := service.UserService{}
-	user := userService.BindUserEntity(requestBody.MailAddress, requestBody.Name, requestBody.PasswordHash)
+	user := userService.BindUserEntity(requestBody.MailAddress, requestBody.Name, requestBody.PasswordHash, -1)
 	newUserId, err := userService.Insert(user, db)
+	user.Id = int(newUserId)
+	if err != nil {
+		action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)
+		return nil, err
+	}
+	action.base.logger.Info("return", "param", user)
+	return convertResponse(user), nil
+}
+
+func (action UserController) Patch(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
+	var requestBody entity.User
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := dao.Driver()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			action.base.logger.Error("close db err", err)
+		}
+	}(db)
+	userService := service.UserService{}
+	user := userService.BindUserEntity(requestBody.MailAddress, requestBody.Name, "", requestBody.Id)
+	newUserId, err := userService.Update(user, db)
 	user.Id = int(newUserId)
 	if err != nil {
 		action.base.logger.Error("ユーザ情報の登録に失敗しました。", "error info", err)

@@ -113,3 +113,20 @@ func (dao UserDao) GetByHash(hash string) (entity.User, error) {
 	dao.Logger.Info("result", "entity", selectedUser)
 	return selectedUser, err
 }
+
+func (dao UserDao) Update(user entity.User) (int64, error) {
+	sqlStr := `
+		UPDATE
+			users
+		SET
+		    name = ?,
+		    mail_address = ?
+		WHERE
+		    id = ?
+	`
+	_, err := dao.Driver.Exec(sqlStr, user.Name, user.MailAddress, user.Id)
+	if err != nil {
+		return -1, errors.New("更新に失敗しました。")
+	}
+	return 1, err
+}

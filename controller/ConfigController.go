@@ -89,3 +89,7 @@ func (action ConfigController) Post(w http.ResponseWriter, r *http.Request) (map
 	action.base.logger.Info("return", "param", configuration)
 	return convertResponse(configuration), nil
 }
+
+func (action ConfigController) Patch(w http.ResponseWriter, r *http.Request) (map[string]interface{}, error) {
+	return action.Post(w, r)
+}

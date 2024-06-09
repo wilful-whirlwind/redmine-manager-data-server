@@ -38,8 +38,9 @@ func (service UserService) CalculatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", argon2.Key([]byte(password), []byte(salt+pepper), 3, 32*1024, 4, 32))
 }
 
-func (service UserService) BindUserEntity(mailAddress string, name string, rawPassword string) entity.User {
+func (service UserService) BindUserEntity(mailAddress string, name string, rawPassword string, id int) entity.User {
 	return entity.User{
+		Id:           id,
 		MailAddress:  mailAddress,
 		Name:         name,
 		PasswordHash: service.CalculatePasswordHash(rawPassword),
@@ -61,4 +62,13 @@ func (service UserService) GetByHash(request string, driver *sql.DB) (entity.Use
 	passwordHash := service.CalculatePasswordHash(request)
 	selectedUser, err := userDao.GetByHash(passwordHash)
 	return selectedUser, err
+}
+
+func (service UserService) Update(user entity.User, driver *sql.DB) (int64, error) {
+	userDao := dao.UserDao{Driver: driver}
+	createdUserId, err := userDao.Update(user)
+	if err != nil {
+		return -1, err
+	}
+	return createdUserId, nil
 }

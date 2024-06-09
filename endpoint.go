@@ -11,7 +11,7 @@ func cors(fs http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "https://localhost:8081")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH")
 		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Redmine-API-Key, X-CSRF-Token")
 
 		fs.ServeHTTP(w, r)

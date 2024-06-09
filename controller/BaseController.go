@@ -44,6 +44,9 @@ func Execute(w http.ResponseWriter, r *http.Request, targetAction BaseActionInte
 	case "POST":
 		responseBody, _ = targetAction.Post(w, r)
 		break
+	case "PATCH":
+		responseBody, _ = targetAction.Patch(w, r)
+		break
 	}
 	setDefaultHeader(w)
 	convertBodyToJSON(responseBody, w)
